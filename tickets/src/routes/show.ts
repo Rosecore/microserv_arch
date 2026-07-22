@@ -1,17 +1,17 @@
 import express, { Request, Response } from 'express';
-import { NotFoundError } from '@sgtickets/common';
-import { Ticket } from '../models/ticket';
+import { NotFoundError } from '@anitix/shared';
+import { Screening } from '../models/screening';
 
 const router = express.Router();
 
 router.get('/api/tickets/:id', async (req: Request, res: Response) => {
-  const ticket = await Ticket.findById(req.params.id);
+  const screening = await Screening.findById(req.params.id);
 
-  if (!ticket) {
+  if (!screening) {
     throw new NotFoundError();
   }
 
-  res.send(ticket);
+  res.send(screening);
 });
 
-export { router as showTicketRouter };
+export { router as showScreeningRouter };

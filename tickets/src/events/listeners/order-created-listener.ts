@@ -1,34 +1,34 @@
 import { Message } from 'node-nats-streaming';
-import { Listener, OrderCreatedEvent, Subjects } from '@sgtickets/common';
+import { Listener, OrderCreatedEvent, Subjects } from '@anitix/shared';
 import { queueGroupName } from './queue-group-name';
-import { Ticket } from '../../models/ticket';
-import { TicketUpdatedPublisher } from '../publishers/ticket-updated-publisher';
+import { Screening } from '../../models/screening';
+import { ScreeningUpdatedPublisher } from '../publishers/screening-updated-publisher';
 
 export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
   subject: Subjects.OrderCreated = Subjects.OrderCreated;
   queueGroupName = queueGroupName;
 
   async onMessage(data: OrderCreatedEvent['data'], msg: Message) {
-    // Find the ticket that the order is reserving
-    const ticket = await Ticket.findById(data.ticket.id);
+    // Find the screening that the order is reserving
+    const screening = await Screening.findById(data.ticket.id);
 
-    // If no ticket, throw error
-    if (!ticket) {
-      throw new Error('Ticket not found');
+    // If no screening, throw error
+    if (!screening) {
+      throw new Error('Screening not found');
     }
 
-    // Mark the ticket as being reserved by setting its orderId property
-    ticket.set({ orderId: data.id });
+    // Mark the screening as being reserved by setting its orderId property
+    screening.set({ orderId: data.id });
 
-    // Save the ticket
-    await ticket.save();
-    await new TicketUpdatedPublisher(this.client).publish({
-      id: ticket.id,
-      price: ticket.price,
-      title: ticket.title,
-      userId: ticket.userId,
-      orderId: ticket.orderId,
-      version: ticket.version,
+    // Save the screening
+    await screening.save();
+    await new ScreeningUpdatedPublisher(this.client).publish({
+      id: screening.id,
+      price: screening.price,
+      title: screening.title,
+      userId: screening.userId,
+      orderId: screening.orderId,
+      version: screening.version,
     });
 
     // ack the message

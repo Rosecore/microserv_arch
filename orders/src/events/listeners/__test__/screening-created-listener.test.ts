@@ -1,16 +1,16 @@
 import { Message } from 'node-nats-streaming';
 import mongoose from 'mongoose';
-import { TicketCreatedEvent } from '@sgtickets/common';
-import { TicketCreatedListener } from '../ticket-created-listener';
+import { ScreeningCreatedEvent } from '@anitix/shared';
+import { ScreeningCreatedListener } from '../screening-created-listener';
 import { natsWrapper } from '../../../nats-wrapper';
-import { Ticket } from '../../../models/ticket';
+import { Screening } from '../../../models/screening';
 
 const setup = async () => {
   // create an instance of the listener
-  const listener = new TicketCreatedListener(natsWrapper.client);
+  const listener = new ScreeningCreatedListener(natsWrapper.client);
 
   // create a fake data event
-  const data: TicketCreatedEvent['data'] = {
+  const data: ScreeningCreatedEvent['data'] = {
     version: 0,
     id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
@@ -33,12 +33,12 @@ it('Билет создан', async () => {
   // call the onMessage function with the data object + message object
   await listener.onMessage(data, msg);
 
-  // write assertions to make sure a ticket was created!
-  const ticket = await Ticket.findById(data.id);
+  // write assertions to make sure a screening was created!
+  const screening = await Screening.findById(data.id);
 
-  expect(ticket).toBeDefined();
-  expect(ticket!.title).toEqual(data.title);
-  expect(ticket!.price).toEqual(data.price);
+  expect(screening).toBeDefined();
+  expect(screening!.title).toEqual(data.title);
+  expect(screening!.price).toEqual(data.price);
 });
 
 it('Запрашивает сообщение об успешном выполнении события', async () => {

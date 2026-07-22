@@ -1,12 +1,12 @@
 import express, { Request, Response } from 'express';
-import { Ticket } from '../models/ticket';
+import { Screening } from '../models/screening';
 
 const router = express.Router();
 
 router.get('/api/tickets', async (req: Request, res: Response) => {
-  const tickets = await Ticket.find({});
+  const screenings = await Screening.find({});
 
-  res.send(tickets);
+  res.send(screenings);
 });
 
-export { router as indexTicketRouter };
+export { router as indexScreeningRouter };

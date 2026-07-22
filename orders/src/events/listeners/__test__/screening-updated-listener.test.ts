@@ -1,26 +1,26 @@
 import mongoose from 'mongoose';
 import { Message } from 'node-nats-streaming';
-import { TicketUpdatedEvent } from '@sgtickets/common';
-import { TicketUpdatedListener } from '../ticket-updated-listener';
+import { ScreeningUpdatedEvent } from '@anitix/shared';
+import { ScreeningUpdatedListener } from '../screening-updated-listener';
 import { natsWrapper } from '../../../nats-wrapper';
-import { Ticket } from '../../../models/ticket';
+import { Screening } from '../../../models/screening';
 
 const setup = async () => {
   // Create a listener
-  const listener = new TicketUpdatedListener(natsWrapper.client);
+  const listener = new ScreeningUpdatedListener(natsWrapper.client);
 
-  // Create and save a ticket
-  const ticket = Ticket.build({
+  // Create and save a screening
+  const screening = Screening.build({
     id: mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
-  await ticket.save();
+  await screening.save();
 
   // Create a fake data object
-  const data: TicketUpdatedEvent['data'] = {
-    id: ticket.id,
-    version: ticket.version + 1,
+  const data: ScreeningUpdatedEvent['data'] = {
+    id: screening.id,
+    version: screening.version + 1,
     title: 'new concert',
     price: 999,
     userId: 'ablskdjf',
@@ -33,19 +33,19 @@ const setup = async () => {
   };
 
   // return all of this stuff
-  return { msg, data, ticket, listener };
+  return { msg, data, screening, listener };
 };
 
 it('билет найден и обновлен', async () => {
-  const { msg, data, ticket, listener } = await setup();
+  const { msg, data, screening, listener } = await setup();
 
   await listener.onMessage(data, msg);
 
-  const updatedTicket = await Ticket.findById(ticket.id);
+  const updatedScreening = await Screening.findById(screening.id);
 
-  expect(updatedTicket!.title).toEqual(data.title);
-  expect(updatedTicket!.price).toEqual(data.price);
-  expect(updatedTicket!.version).toEqual(data.version);
+  expect(updatedScreening!.title).toEqual(data.title);
+  expect(updatedScreening!.price).toEqual(data.price);
+  expect(updatedScreening!.version).toEqual(data.version);
 });
 
 it('Запрашивает сообщение об успешном выполнении события', async () => {
@@ -57,7 +57,7 @@ it('Запрашивает сообщение об успешном выполн
 });
 
 it('Не запрашивает сообщение об успешном выполнении события, если событие уже просрочено', async () => {
-  const { msg, data, listener, ticket } = await setup();
+  const { msg, data, listener, screening } = await setup();
 
   data.version = 10;
 

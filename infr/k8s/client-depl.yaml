@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: client
-          image: rosecore818/client
+          image: anitix/client
 ---
 apiVersion: v1
 kind: Service

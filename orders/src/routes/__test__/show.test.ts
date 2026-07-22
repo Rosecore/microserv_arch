@@ -1,23 +1,23 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
 import { app } from '../../app';
-import { Ticket } from '../../models/ticket';
+import { Screening } from '../../models/screening';
 
 it('Демонстрирует заказы', async () => {
-  // Create a ticket
-  const ticket = Ticket.build({
+  // Create a screening
+  const screening = Screening.build({
     id: mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
-  await ticket.save();
+  await screening.save();
 
   const user = global.signin();
-  // make a request to build an order with this ticket
+  // make a request to build an order with this screening
   const { body: order } = await request(app)
     .post('/api/orders')
     .set('Cookie', user)
-    .send({ ticketId: ticket.id })
+    .send({ ticketId: screening.id })
     .expect(201);
 
   // make request to fetch the order
@@ -31,20 +31,20 @@ it('Демонстрирует заказы', async () => {
 });
 
 it('Не демонстрирует заказы если направляется запрос к другому пользователю', async () => {
-  // Create a ticket
-  const ticket = Ticket.build({
+  // Create a screening
+  const screening = Screening.build({
     id: mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
-  await ticket.save();
+  await screening.save();
 
   const user = global.signin();
-  // make a request to build an order with this ticket
+  // make a request to build an order with this screening
   const { body: order } = await request(app)
     .post('/api/orders')
     .set('Cookie', user)
-    .send({ ticketId: ticket.id })
+    .send({ ticketId: screening.id })
     .expect(201);
 
   // make request to fetch the order

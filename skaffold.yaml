@@ -8,7 +8,7 @@ build:
   local:
     push: false
   artifacts:
-    - image: rosecore818/auth
+    - image: anitix/auth
       context: auth
       docker:
         dockerfile: Dockerfile
@@ -16,7 +16,7 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image: rosecore818/client
+    - image: anitix/client
       context: client
       docker:
         dockerfile: Dockerfile
@@ -24,7 +24,7 @@ build:
         manual:
           - src: '**/*.js'
             dest: .
-    - image: rosecore818/tickets
+    - image: anitix/tickets
       context: tickets
       docker:
         dockerfile: Dockerfile
@@ -32,7 +32,7 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image: rosecore818/orders
+    - image: anitix/orders
       context: orders
       docker:
         dockerfile: Dockerfile
@@ -40,7 +40,7 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image: rosecore818/expire
+    - image: anitix/expire
       context: expire
       docker:
         dockerfile: Dockerfile
@@ -48,7 +48,7 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image: rosecore818/payment
+    - image: anitix/payment
       context: payment
       docker:
         dockerfile: Dockerfile

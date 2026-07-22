@@ -1,25 +1,25 @@
 import mongoose from 'mongoose';
 import { Message } from 'node-nats-streaming';
-import { OrderStatus, ExpirationCompleteEvent } from '@sgtickets/common';
+import { OrderStatus, ExpirationCompleteEvent } from '@anitix/shared';
 import { ExpirationCompleteListener } from '../expiration-complete-listener';
 import { natsWrapper } from '../../../nats-wrapper';
 import { Order } from '../../../models/order';
-import { Ticket } from '../../../models/ticket';
+import { Screening } from '../../../models/screening';
 
 const setup = async () => {
   const listener = new ExpirationCompleteListener(natsWrapper.client);
 
-  const ticket = Ticket.build({
+  const screening = Screening.build({
     id: mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
-  await ticket.save();
+  await screening.save();
   const order = Order.build({
     status: OrderStatus.Created,
     userId: 'alskdfj',
     expiresAt: new Date(),
-    ticket,
+    ticket: screening,
   });
   await order.save();
 
@@ -32,7 +32,7 @@ const setup = async () => {
     ack: jest.fn(),
   };
 
-  return { listener, order, ticket, data, msg };
+  return { listener, order, screening, data, msg };
 };
 
 it('статус заказа обновляется на отмененный', async () => {

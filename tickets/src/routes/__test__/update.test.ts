@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { app } from '../../app';
 import mongoose from 'mongoose';
-import { Ticket } from '../../models/ticket';
+import { Screening } from '../../models/screening';
 import { natsWrapper } from '../../nats-wrapper';
 
 it('returns a 404 if the provided id does not exist', async () => {
@@ -27,7 +27,7 @@ it('returns a 401 if the user is not authenticated', async () => {
     .expect(401);
 });
 
-it('returns a 401 if the user does not own the ticket', async () => {
+it('returns a 401 if the user does not own the screening', async () => {
   const response = await request(app)
     .post('/api/tickets')
     .set('Cookie', global.signin())
@@ -76,7 +76,7 @@ it('returns a 400 if the user provides an invalid title or price', async () => {
     .expect(400);
 });
 
-it('updates the ticket provided valid inputs', async () => {
+it('updates the screening provided valid inputs', async () => {
   const cookie = global.signin();
 
   const response = await request(app)
@@ -96,12 +96,12 @@ it('updates the ticket provided valid inputs', async () => {
     })
     .expect(200);
 
-  const ticketResponse = await request(app)
+  const screeningResponse = await request(app)
     .get(`/api/tickets/${response.body.id}`)
     .send();
 
-  expect(ticketResponse.body.title).toEqual('new title');
-  expect(ticketResponse.body.price).toEqual(100);
+  expect(screeningResponse.body.title).toEqual('new title');
+  expect(screeningResponse.body.price).toEqual(100);
 });
 
 it('publishes an event', async () => {
@@ -127,7 +127,7 @@ it('publishes an event', async () => {
   expect(natsWrapper.client.publish).toHaveBeenCalled();
 });
 
-it('rejects updates if the ticket is reserved', async () => {
+it('rejects updates if the screening is reserved', async () => {
   const cookie = global.signin();
 
   const response = await request(app)
@@ -138,9 +138,9 @@ it('rejects updates if the ticket is reserved', async () => {
       price: 20,
     });
 
-  const ticket = await Ticket.findById(response.body.id);
-  ticket!.set({ orderId: mongoose.Types.ObjectId().toHexString() });
-  await ticket!.save();
+  const screening = await Screening.findById(response.body.id);
+  screening!.set({ orderId: mongoose.Types.ObjectId().toHexString() });
+  await screening!.save();
 
   await request(app)
     .put(`/api/tickets/${response.body.id}`)

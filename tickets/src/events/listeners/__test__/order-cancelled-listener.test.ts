@@ -1,27 +1,27 @@
 import mongoose from 'mongoose';
 import { Message } from 'node-nats-streaming';
-import { OrderCancelledEvent } from '@sgtickets/common';
+import { OrderCancelledEvent } from '@anitix/shared';
 import { natsWrapper } from '../../../nats-wrapper';
 import { OrderCancelledListener } from '../order-cancelled-listener';
-import { Ticket } from '../../../models/ticket';
+import { Screening } from '../../../models/screening';
 
 const setup = async () => {
   const listener = new OrderCancelledListener(natsWrapper.client);
 
   const orderId = mongoose.Types.ObjectId().toHexString();
-  const ticket = Ticket.build({
+  const screening = Screening.build({
     title: 'concert',
     price: 20,
     userId: 'asdf',
   });
-  ticket.set({ orderId });
-  await ticket.save();
+  screening.set({ orderId });
+  await screening.save();
 
   const data: OrderCancelledEvent['data'] = {
     id: orderId,
     version: 0,
     ticket: {
-      id: ticket.id,
+      id: screening.id,
     },
   };
 
@@ -30,16 +30,16 @@ const setup = async () => {
     ack: jest.fn(),
   };
 
-  return { msg, data, ticket, orderId, listener };
+  return { msg, data, screening, orderId, listener };
 };
 
 it('Статус билета обновляется, публикуется событие и запрашивается сообщение', async () => {
-  const { msg, data, ticket, orderId, listener } = await setup();
+  const { msg, data, screening, orderId, listener } = await setup();
 
   await listener.onMessage(data, msg);
 
-  const updatedTicket = await Ticket.findById(ticket.id);
-  expect(updatedTicket!.orderId).not.toBeDefined();
+  const updatedScreening = await Screening.findById(screening.id);
+  expect(updatedScreening!.orderId).not.toBeDefined();
   expect(msg.ack).toHaveBeenCalled();
   expect(natsWrapper.client.publish).toHaveBeenCalled();
 });

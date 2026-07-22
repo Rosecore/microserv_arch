@@ -7,7 +7,7 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: 'true'
 spec:
   rules:
-    - host: trytobuy.dev
+    - host: anitix.dev
       http:
         paths:
           - path: /api/users/?(.*)

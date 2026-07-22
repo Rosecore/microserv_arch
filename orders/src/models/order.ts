@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
-import { OrderStatus } from '@sgtickets/common';
-import { TicketDoc } from './ticket';
+import { OrderStatus } from '@anitix/shared';
+import { ScreeningDoc } from './screening';
 
 export { OrderStatus };
 
@@ -9,14 +9,14 @@ interface OrderAttrs {
   userId: string;
   status: OrderStatus;
   expiresAt: Date;
-  ticket: TicketDoc;
+  ticket: ScreeningDoc;
 }
 
 interface OrderDoc extends mongoose.Document {
   userId: string;
   status: OrderStatus;
   expiresAt: Date;
-  ticket: TicketDoc;
+  ticket: ScreeningDoc;
   version: number;
 }
 
@@ -41,7 +41,7 @@ const orderSchema = new mongoose.Schema(
     },
     ticket: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Ticket',
+      ref: 'Screening',
     },
   },
   {

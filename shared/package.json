@@ -1,0 +1,27 @@
+{
+  "name": "@anitix/shared",
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@types/cookie-session": "^2.0.39",
+    "cookie-session": "^1.4.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.4.0",
+    "jsonwebtoken": "^8.5.1",
+    "node-nats-streaming": "^0.3.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.3",
+    "@types/express-serve-static-core": "4.17.19",
+    "@types/jsonwebtoken": "^8.3.8",
+    "@types/node": "^13.13.4",
+    "typescript": "^3.8.3"
+  },
+  "overrides": {
+    "@types/express-serve-static-core": "4.17.19"
+  }
+}

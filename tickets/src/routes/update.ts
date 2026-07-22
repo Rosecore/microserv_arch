@@ -6,9 +6,9 @@ import {
   requireAuth,
   NotAuthorizedError,
   BadRequestError,
-} from '@sgtickets/common';
-import { Ticket } from '../models/ticket';
-import { TicketUpdatedPublisher } from '../events/publishers/ticket-updated-publisher';
+} from '@anitix/shared';
+import { Screening } from '../models/screening';
+import { ScreeningUpdatedPublisher } from '../events/publishers/screening-updated-publisher';
 import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
@@ -24,35 +24,35 @@ router.put(
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const ticket = await Ticket.findById(req.params.id);
+    const screening = await Screening.findById(req.params.id);
 
-    if (!ticket) {
+    if (!screening) {
       throw new NotFoundError();
     }
 
-    if (ticket.orderId) {
-      throw new BadRequestError('Cannot edit a reserved ticket');
+    if (screening.orderId) {
+      throw new BadRequestError('Cannot edit a reserved screening');
     }
 
-    if (ticket.userId !== req.currentUser!.id) {
+    if (screening.userId !== req.currentUser!.id) {
       throw new NotAuthorizedError();
     }
 
-    ticket.set({
+    screening.set({
       title: req.body.title,
       price: req.body.price,
     });
-    await ticket.save();
-    new TicketUpdatedPublisher(natsWrapper.client).publish({
-      id: ticket.id,
-      title: ticket.title,
-      price: ticket.price,
-      userId: ticket.userId,
-      version: ticket.version,
+    await screening.save();
+    new ScreeningUpdatedPublisher(natsWrapper.client).publish({
+      id: screening.id,
+      title: screening.title,
+      price: screening.price,
+      userId: screening.userId,
+      version: screening.version,
     });
 
-    res.send(ticket);
+    res.send(screening);
   }
 );
 
-export { router as updateTicketRouter };
+export { router as updateScreeningRouter };

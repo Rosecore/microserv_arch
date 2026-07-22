@@ -2,7 +2,7 @@ import {
   Subjects,
   Publisher,
   ExpirationCompleteEvent,
-} from '@sgtickets/common';
+} from '@anitix/shared';
 
 export class ExpirationCompletePublisher extends Publisher<
   ExpirationCompleteEvent

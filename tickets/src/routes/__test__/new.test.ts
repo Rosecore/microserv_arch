@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { app } from '../../app';
-import { Ticket } from '../../models/ticket';
+import { Screening } from '../../models/screening';
 import { natsWrapper } from '../../nats-wrapper';
 
 it('has a route handler listening to /api/tickets for post requests', async () => {
@@ -60,9 +60,9 @@ it('returns an error if an invalid price is provided', async () => {
     .expect(400);
 });
 
-it('creates a ticket with valid inputs', async () => {
-  let tickets = await Ticket.find({});
-  expect(tickets.length).toEqual(0);
+it('creates a screening with valid inputs', async () => {
+  let screenings = await Screening.find({});
+  expect(screenings.length).toEqual(0);
 
   const title = 'asldkfj';
 
@@ -75,10 +75,10 @@ it('creates a ticket with valid inputs', async () => {
     })
     .expect(201);
 
-  tickets = await Ticket.find({});
-  expect(tickets.length).toEqual(1);
-  expect(tickets[0].price).toEqual(20);
-  expect(tickets[0].title).toEqual(title);
+  screenings = await Screening.find({});
+  expect(screenings.length).toEqual(1);
+  expect(screenings[0].price).toEqual(20);
+  expect(screenings[0].title).toEqual(title);
 });
 
 it('publishes an event', async () => {

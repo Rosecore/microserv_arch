@@ -6,9 +6,9 @@ import {
   NotFoundError,
   OrderStatus,
   BadRequestError,
-} from '@sgtickets/common';
+} from '@anitix/shared';
 import { body } from 'express-validator';
-import { Ticket } from '../models/ticket';
+import { Screening } from '../models/screening';
 import { Order } from '../models/order';
 import { OrderCreatedPublisher } from '../events/publishers/order-created-publisher';
 import { natsWrapper } from '../nats-wrapper';
@@ -21,6 +21,7 @@ router.post(
   '/api/orders',
   requireAuth,
   [
+    // TODO(review): body field kept as ticketId to match the unchanged client contract; rename to screeningId in Phase 4 alongside the client
     body('ticketId')
       .not()
       .isEmpty()
@@ -31,16 +32,16 @@ router.post(
   async (req: Request, res: Response) => {
     const { ticketId } = req.body;
 
-    // Find the ticket the user is trying to order in the database
-    const ticket = await Ticket.findById(ticketId);
-    if (!ticket) {
+    // Find the screening the user is trying to order in the database
+    const screening = await Screening.findById(ticketId);
+    if (!screening) {
       throw new NotFoundError();
     }
 
-    // Make sure that this ticket is not already reserved
-    const isReserved = await ticket.isReserved();
+    // Make sure that this screening is not already reserved
+    const isReserved = await screening.isReserved();
     if (isReserved) {
-      throw new BadRequestError('Ticket is already reserved');
+      throw new BadRequestError('Screening is already reserved');
     }
 
     // Calculate an expiration date for this order
@@ -52,7 +53,7 @@ router.post(
       userId: req.currentUser!.id,
       status: OrderStatus.Created,
       expiresAt: expiration,
-      ticket,
+      ticket: screening,
     });
     await order.save();
 
@@ -64,8 +65,8 @@ router.post(
       userId: order.userId,
       expiresAt: order.expiresAt.toISOString(),
       ticket: {
-        id: ticket.id,
-        price: ticket.price,
+        id: screening.id,
+        price: screening.price,
       },
     });
 

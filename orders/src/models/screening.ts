@@ -2,28 +2,28 @@ import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 import { Order, OrderStatus } from './order';
 
-interface TicketAttrs {
+interface ScreeningAttrs {
   id: string;
   title: string;
   price: number;
 }
 
-export interface TicketDoc extends mongoose.Document {
+export interface ScreeningDoc extends mongoose.Document {
   title: string;
   price: number;
   version: number;
   isReserved(): Promise<boolean>;
 }
 
-interface TicketModel extends mongoose.Model<TicketDoc> {
-  build(attrs: TicketAttrs): TicketDoc;
+interface ScreeningModel extends mongoose.Model<ScreeningDoc> {
+  build(attrs: ScreeningAttrs): ScreeningDoc;
   findByEvent(event: {
     id: string;
     version: number;
-  }): Promise<TicketDoc | null>;
+  }): Promise<ScreeningDoc | null>;
 }
 
-const ticketSchema = new mongoose.Schema(
+const screeningSchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -45,25 +45,25 @@ const ticketSchema = new mongoose.Schema(
   }
 );
 
-ticketSchema.set('versionKey', 'version');
-ticketSchema.plugin(updateIfCurrentPlugin);
+screeningSchema.set('versionKey', 'version');
+screeningSchema.plugin(updateIfCurrentPlugin);
 
-ticketSchema.statics.findByEvent = (event: { id: string; version: number }) => {
-  return Ticket.findOne({
+screeningSchema.statics.findByEvent = (event: { id: string; version: number }) => {
+  return Screening.findOne({
     _id: event.id,
     version: event.version - 1,
   });
 };
-ticketSchema.statics.build = (attrs: TicketAttrs) => {
-  return new Ticket({
+screeningSchema.statics.build = (attrs: ScreeningAttrs) => {
+  return new Screening({
     _id: attrs.id,
     title: attrs.title,
     price: attrs.price,
   });
 };
-ticketSchema.methods.isReserved = async function() {
+screeningSchema.methods.isReserved = async function() {
   const existingOrder = await Order.findOne({
-    ticket: this.id, // Ticket id
+    ticket: this.id, // Screening id
     status: {
       $in: [
         OrderStatus.Created,
@@ -75,6 +75,6 @@ ticketSchema.methods.isReserved = async function() {
   return !!existingOrder
 }
 
-const Ticket = mongoose.model<TicketDoc, TicketModel>('Ticket', ticketSchema);
+const Screening = mongoose.model<ScreeningDoc, ScreeningModel>('Screening', screeningSchema);
 
-export { Ticket };
+export { Screening };

@@ -2,11 +2,11 @@ import express from 'express';
 import 'express-async-errors';
 import { json } from 'body-parser';
 import cookieSession from 'cookie-session';
-import { errorHandler, NotFoundError, currentUser } from '@sgtickets/common';
-import { createTicketRouter } from './routes/new';
-import { showTicketRouter } from './routes/show';
-import { indexTicketRouter } from './routes/index';
-import { updateTicketRouter } from './routes/update';
+import { errorHandler, NotFoundError, currentUser } from '@anitix/shared';
+import { createScreeningRouter } from './routes/new';
+import { showScreeningRouter } from './routes/show';
+import { indexScreeningRouter } from './routes/index';
+import { updateScreeningRouter } from './routes/update';
 
 const app = express();
 app.set('trust proxy', true);
@@ -19,10 +19,10 @@ app.use(
 );
 app.use(currentUser);
 
-app.use(createTicketRouter);
-app.use(showTicketRouter);
-app.use(indexTicketRouter);
-app.use(updateTicketRouter);
+app.use(createScreeningRouter);
+app.use(showScreeningRouter);
+app.use(indexScreeningRouter);
+app.use(updateScreeningRouter);
 
 app.all('*', async (req, res) => {
   throw new NotFoundError();

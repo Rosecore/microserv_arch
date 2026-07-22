@@ -1,25 +1,25 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
 import { app } from '../../app';
-import { Ticket } from '../../models/ticket';
+import { Screening } from '../../models/screening';
 import { Order, OrderStatus } from '../../models/order';
 import { natsWrapper } from '../../nats-wrapper';
 
 it('Заказ отмечается, как отмененный', async () => {
-  // create a ticket with Ticket Model
-  const ticket = Ticket.build({
+  // create a screening with Screening Model
+  const screening = Screening.build({
     id: mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
-  await ticket.save();
+  await screening.save();
 
   const user = global.signin();
   // make a request to create an order
   const { body: order } = await request(app)
     .post('/api/orders')
     .set('Cookie', user)
-    .send({ ticketId: ticket.id })
+    .send({ ticketId: screening.id })
     .expect(201);
 
   // make a request to cancel the order
@@ -36,19 +36,19 @@ it('Заказ отмечается, как отмененный', async () => {
 });
 
 it('запускает событие отмены заказа', async () => {
-  const ticket = Ticket.build({
+  const screening = Screening.build({
     id: mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
-  await ticket.save();
+  await screening.save();
 
   const user = global.signin();
   // make a request to create an order
   const { body: order } = await request(app)
     .post('/api/orders')
     .set('Cookie', user)
-    .send({ ticketId: ticket.id })
+    .send({ ticketId: screening.id })
     .expect(201);
 
   // make a request to cancel the order

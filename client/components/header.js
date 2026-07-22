@@ -22,7 +22,7 @@ export default ({ currentUser }) => {
   return (
     <nav className="navbar navbar-light .bg-dark">
       <Link href="/">
-        <a className="navbar-brand text-white font-weight-light">Сервис для продажи и покупки билетов на транспорт. Транькова М.С. А-07-17.</a>
+        <a className="navbar-brand text-white font-weight-light">AniTix</a>
       </Link>
 
       <div className="d-flex justify-content-end">
