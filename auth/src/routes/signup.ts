@@ -24,15 +24,15 @@ router.post(
     await newuser.save();
     const newuserJwt = jwt.sign(
       {
-        id: user.id,
-        email: user.email
+        id: newuser.id,
+        email: newuser.email
       },
       process.env.JWT_KEY!
     );
     req.session = {
       jwt: newuserJwt
     };
-    res.status(201).send(user);
+    res.status(201).send(newuser);
   }
 );
 export { router as signupRouter };
