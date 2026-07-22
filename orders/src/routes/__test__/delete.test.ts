@@ -8,7 +8,7 @@ import { natsWrapper } from '../../nats-wrapper';
 it('Заказ отмечается, как отмененный', async () => {
   // create a screening with Screening Model
   const screening = Screening.build({
-    id: mongoose.Types.ObjectId().toHexString(),
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
@@ -37,7 +37,7 @@ it('Заказ отмечается, как отмененный', async () => {
 
 it('запускает событие отмены заказа', async () => {
   const screening = Screening.build({
-    id: mongoose.Types.ObjectId().toHexString(),
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });

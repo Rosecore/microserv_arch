@@ -6,7 +6,7 @@ import { Screening } from '../../models/screening';
 import { natsWrapper } from '../../nats-wrapper';
 
 it('Возвращает ошибку, если билет больше не существует', async () => {
-  const ticketId = mongoose.Types.ObjectId();
+  const ticketId = new mongoose.Types.ObjectId();
 
   await request(app)
     .post('/api/orders')
@@ -17,7 +17,7 @@ it('Возвращает ошибку, если билет больше не с�
 
 it('Возвращает ошибку, еси билет уже зарезервирован', async () => {
   const screening = Screening.build({
-    id: mongoose.Types.ObjectId().toHexString(),
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
@@ -39,7 +39,7 @@ it('Возвращает ошибку, еси билет уже зарезерв
 
 it('билет резеривруется при покупке', async () => {
   const screening = Screening.build({
-    id: mongoose.Types.ObjectId().toHexString(),
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
@@ -54,7 +54,7 @@ it('билет резеривруется при покупке', async () => {
 
 it('Запускает событие создания заказа', async () => {
   const screening = Screening.build({
-    id: mongoose.Types.ObjectId().toHexString(),
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });

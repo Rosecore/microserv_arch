@@ -3,14 +3,12 @@ import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 
 declare global {
-  namespace NodeJS {
-    interface Global {
-      signin(): string[];
-    }
-  }
+  // eslint-disable-next-line no-var
+  var signin: () => string[];
 }
 
 jest.mock('../nats-wrapper');
+jest.setTimeout(30000); // TODO(review): mongodb-memory-server startup exceeds Jest 29's 5s default hook timeout
 
 let mongo: any;
 beforeAll(async () => {
@@ -20,15 +18,12 @@ beforeAll(async () => {
   mongo = new MongoMemoryServer();
   const mongoUri = await mongo.getUri();
 
-  await mongoose.connect(mongoUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  await mongoose.connect(mongoUri);
 });
 
 beforeEach(async () => {
   jest.clearAllMocks();
-  const collections = await mongoose.connection.db.collections();
+  const collections = await mongoose.connection.db!.collections();
 
   for (let collection of collections) {
     await collection.deleteMany({});

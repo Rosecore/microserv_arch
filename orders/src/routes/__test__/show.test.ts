@@ -6,7 +6,7 @@ import { Screening } from '../../models/screening';
 it('Демонстрирует заказы', async () => {
   // Create a screening
   const screening = Screening.build({
-    id: mongoose.Types.ObjectId().toHexString(),
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
@@ -33,7 +33,7 @@ it('Демонстрирует заказы', async () => {
 it('Не демонстрирует заказы если направляется запрос к другому пользователю', async () => {
   // Create a screening
   const screening = Screening.build({
-    id: mongoose.Types.ObjectId().toHexString(),
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
