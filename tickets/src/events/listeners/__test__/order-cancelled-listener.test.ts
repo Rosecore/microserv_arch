@@ -8,7 +8,7 @@ import { Screening } from '../../../models/screening';
 const setup = async () => {
   const listener = new OrderCancelledListener(natsWrapper.client);
 
-  const orderId = mongoose.Types.ObjectId().toHexString();
+  const orderId = new mongoose.Types.ObjectId().toHexString();
   const screening = Screening.build({
     title: 'concert',
     price: 20,

@@ -13,6 +13,7 @@ interface ScreeningDoc extends mongoose.Document {
   date: Date; // TODO(review): pre-existing bug fixed — original field type was the undeclared identifier `date`
   userId: string;
   orderId?: string;
+  version: number;
 }
 
 interface ScreeningModel extends mongoose.Model<ScreeningDoc> {
@@ -43,7 +44,7 @@ const screeningSchema = new mongoose.Schema(
   },
   {
     toJSON: {
-      transform(doc, ret) {
+      transform(doc, ret: any) {
         ret.id = ret._id;
         delete ret._id;
       },

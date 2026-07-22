@@ -139,7 +139,7 @@ it('rejects updates if the screening is reserved', async () => {
     });
 
   const screening = await Screening.findById(response.body.id);
-  screening!.set({ orderId: mongoose.Types.ObjectId().toHexString() });
+  screening!.set({ orderId: new mongoose.Types.ObjectId().toHexString() });
   await screening!.save();
 
   await request(app)

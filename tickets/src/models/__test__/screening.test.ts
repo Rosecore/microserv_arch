@@ -1,6 +1,6 @@
 import { Screening } from '../screening';
 
-it('implements optimistic concurrency control', async (done) => {
+it('implements optimistic concurrency control', async () => {
   // Create an instance of a screening
   const screening = Screening.build({
     title: 'concert',
@@ -26,7 +26,7 @@ it('implements optimistic concurrency control', async (done) => {
   try {
     await secondInstance!.save();
   } catch (err) {
-    return done();
+    return;
   }
 
   throw new Error('Should not reach this point');
