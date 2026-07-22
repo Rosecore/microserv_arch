@@ -30,13 +30,9 @@ router.post(
       existingUser.password,
       password
     );
-    var adminpasswordsMatch = await Password.compare(
-      adminUser.password,
-      password
-    );
-    if (passwordsMatch&&adminpasswordsMatch){
-        var UserisAdmin = true;
-    }
+    // TODO(review): removed dead/broken admin-check block (referenced an undefined
+    // `adminUser` and never influenced the response) — pre-existing bug found while
+    // fixing the toolchain build; not part of any admin feature that currently works.
     if (!passwordsMatch) {
       throw new BadRequestError('Invalid Credentials');
     }

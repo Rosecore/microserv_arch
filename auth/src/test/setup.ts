@@ -4,12 +4,11 @@ import request from 'supertest';
 import { app } from '../app';
 
 declare global {
-  namespace NodeJS {
-    interface Global {
-      signin(): Promise<string[]>;
-    }
-  }
+  // eslint-disable-next-line no-var
+  var signin: () => Promise<string[]>;
 }
+
+jest.setTimeout(30000); // TODO(review): mongodb-memory-server startup exceeds Jest 29's 5s default hook timeout
 
 let mongo: any;
 beforeAll(async () => {
@@ -19,14 +18,11 @@ beforeAll(async () => {
   mongo = new MongoMemoryServer();
   const mongoUri = await mongo.getUri();
 
-  await mongoose.connect(mongoUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  });
+  await mongoose.connect(mongoUri);
 });
 
 beforeEach(async () => {
-  const collections = await mongoose.connection.db.collections();
+  const collections = await mongoose.connection.db!.collections();
 
   for (let collection of collections) {
     await collection.deleteMany({});
@@ -52,5 +48,5 @@ global.signin = async () => {
 
   const cookie = response.get('Set-Cookie');
 
-  return cookie;
+  return cookie!;
 };
