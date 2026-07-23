@@ -12,15 +12,15 @@ it('Возвращает ошибку, если оплачивается нес�
     .set('Cookie', global.signin())
     .send({
       token: 'asldkfj',
-      orderId: mongoose.Types.ObjectId().toHexString(),
+      orderId: new mongoose.Types.ObjectId().toHexString(),
     })
     .expect(404);
 });
 
 it('Возвращет ошибку, если производится оплата заказа не того пользователя', async () => {
   const order = Order.build({
-    id: mongoose.Types.ObjectId().toHexString(),
-    userId: mongoose.Types.ObjectId().toHexString(),
+    id: new mongoose.Types.ObjectId().toHexString(),
+    userId: new mongoose.Types.ObjectId().toHexString(),
     version: 0,
     price: 20,
     status: OrderStatus.Created,
@@ -38,9 +38,9 @@ it('Возвращет ошибку, если производится опла�
 });
 
 it('Возвращает ошибку при попытке оплатить отмененный заказ', async () => {
-  const userId = mongoose.Types.ObjectId().toHexString();
+  const userId = new mongoose.Types.ObjectId().toHexString();
   const order = Order.build({
-    id: mongoose.Types.ObjectId().toHexString(),
+    id: new mongoose.Types.ObjectId().toHexString(),
     userId,
     version: 0,
     price: 20,
@@ -59,10 +59,10 @@ it('Возвращает ошибку при попытке оплатить о�
 });
 
 /*it('returns a 201 with valid inputs', async () => {
-  const userId = mongoose.Types.ObjectId().toHexString();
+  const userId = new mongoose.Types.ObjectId().toHexString();
   const price = Math.floor(Math.random() * 100000);
   const order = Order.build({
-    id: mongoose.Types.ObjectId().toHexString(),
+    id: new mongoose.Types.ObjectId().toHexString(),
     userId,
     version: 0,
     price,

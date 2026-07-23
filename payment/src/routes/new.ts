@@ -36,6 +36,8 @@ router.post(
       throw new BadRequestError('Cannot pay for an cancelled order');
     }
 
+    // TODO(review): stripe.charges.create is legacy (still supported in stripe@14) — migrating to
+    // PaymentIntents requires a coordinated client-side change (Phase 4 replaces react-stripe-checkout).
     const charge = await stripe.charges.create({
       currency: 'usd',
       amount: order.price * 100,

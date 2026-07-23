@@ -9,7 +9,7 @@ const setup = async () => {
   const listener = new OrderCreatedListener(natsWrapper.client);
 
   const data: OrderCreatedEvent['data'] = {
-    id: mongoose.Types.ObjectId().toHexString(),
+    id: new mongoose.Types.ObjectId().toHexString(),
     version: 0,
     expiresAt: 'alskdjf',
     userId: 'alskdjf',

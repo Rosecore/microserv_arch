@@ -9,7 +9,7 @@ const setup = async () => {
   const listener = new OrderCancelledListener(natsWrapper.client);
 
   const order = Order.build({
-    id: mongoose.Types.ObjectId().toHexString(),
+    id: new mongoose.Types.ObjectId().toHexString(),
     status: OrderStatus.Created,
     price: 10,
     userId: 'asldkfj',
