@@ -4,9 +4,10 @@ import {
   ExpirationCompleteEvent,
   OrderStatus,
 } from '@anitix/shared';
-import { Message } from 'node-nats-streaming';
+import { Message, Stan } from 'node-nats-streaming';
+import { Model } from 'mongoose';
 import { queueGroupName } from './queue-group-name';
-import { Order } from '../../models/order';
+import { OrderDocument } from '../../orders/schemas/order.schema';
 import { OrderCancelledPublisher } from '../publishers/order-cancelled-publisher';
 
 export class ExpirationCompleteListener extends Listener<
@@ -15,8 +16,12 @@ export class ExpirationCompleteListener extends Listener<
   queueGroupName = queueGroupName;
   subject: Subjects.ExpirationComplete = Subjects.ExpirationComplete;
 
+  constructor(client: Stan, private readonly orderModel: Model<OrderDocument>) {
+    super(client);
+  }
+
   async onMessage(data: ExpirationCompleteEvent['data'], msg: Message) {
-    const order = await Order.findById(data.orderId).populate('ticket');
+    const order = await this.orderModel.findById(data.orderId).populate('ticket');
 
     if (!order) {
       throw new Error('Order not found');
@@ -28,9 +33,9 @@ export class ExpirationCompleteListener extends Listener<
     await order.save();
     await new OrderCancelledPublisher(this.client).publish({
       id: order.id,
-      version: order.version,
+      version: (order as any).version,
       ticket: {
-        id: order.ticket.id,
+        id: (order.ticket as any).id,
       },
     });
 

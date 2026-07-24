@@ -1,11 +1,9 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
-import { app } from '../../app';
-import { Screening } from '../../models/screening';
 
 const buildScreening = async () => {
-  const screening = Screening.build({
-    id: new mongoose.Types.ObjectId().toHexString(),
+  const screening = new global.screeningModel({
+    _id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
@@ -23,26 +21,26 @@ it('Все заказы пользователя находятся', async () =
   const userOne = global.signin();
   const userTwo = global.signin();
   // Create one order as User #1
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/orders')
     .set('Cookie', userOne)
     .send({ ticketId: screeningOne.id })
     .expect(201);
 
   // Create two orders as User #2
-  const { body: orderOne } = await request(app)
+  const { body: orderOne } = await request(global.app.getHttpServer())
     .post('/api/orders')
     .set('Cookie', userTwo)
     .send({ ticketId: screeningTwo.id })
     .expect(201);
-  const { body: orderTwo } = await request(app)
+  const { body: orderTwo } = await request(global.app.getHttpServer())
     .post('/api/orders')
     .set('Cookie', userTwo)
     .send({ ticketId: screeningThree.id })
     .expect(201);
 
   // Make request to get orders for User #2
-  const response = await request(app)
+  const response = await request(global.app.getHttpServer())
     .get('/api/orders')
     .set('Cookie', userTwo)
     .expect(200);

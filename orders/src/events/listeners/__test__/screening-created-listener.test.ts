@@ -3,11 +3,10 @@ import mongoose from 'mongoose';
 import { ScreeningCreatedEvent } from '@anitix/shared';
 import { ScreeningCreatedListener } from '../screening-created-listener';
 import { natsWrapper } from '../../../nats-wrapper';
-import { Screening } from '../../../models/screening';
 
 const setup = async () => {
   // create an instance of the listener
-  const listener = new ScreeningCreatedListener(natsWrapper.client);
+  const listener = new ScreeningCreatedListener(natsWrapper.client, global.screeningModel);
 
   // create a fake data event
   const data: ScreeningCreatedEvent['data'] = {
@@ -34,7 +33,7 @@ it('Билет создан', async () => {
   await listener.onMessage(data, msg);
 
   // write assertions to make sure a screening was created!
-  const screening = await Screening.findById(data.id);
+  const screening = await global.screeningModel.findById(data.id);
 
   expect(screening).toBeDefined();
   expect(screening!.title).toEqual(data.title);

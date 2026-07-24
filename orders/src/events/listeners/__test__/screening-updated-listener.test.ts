@@ -3,15 +3,14 @@ import { Message } from 'node-nats-streaming';
 import { ScreeningUpdatedEvent } from '@anitix/shared';
 import { ScreeningUpdatedListener } from '../screening-updated-listener';
 import { natsWrapper } from '../../../nats-wrapper';
-import { Screening } from '../../../models/screening';
 
 const setup = async () => {
   // Create a listener
-  const listener = new ScreeningUpdatedListener(natsWrapper.client);
+  const listener = new ScreeningUpdatedListener(natsWrapper.client, global.screeningModel);
 
   // Create and save a screening
-  const screening = Screening.build({
-    id: new mongoose.Types.ObjectId().toHexString(),
+  const screening = new global.screeningModel({
+    _id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
@@ -20,7 +19,7 @@ const setup = async () => {
   // Create a fake data object
   const data: ScreeningUpdatedEvent['data'] = {
     id: screening.id,
-    version: screening.version + 1,
+    version: (screening as any).version + 1,
     title: 'new concert',
     price: 999,
     userId: 'ablskdjf',
@@ -41,11 +40,11 @@ it('билет найден и обновлен', async () => {
 
   await listener.onMessage(data, msg);
 
-  const updatedScreening = await Screening.findById(screening.id);
+  const updatedScreening = await global.screeningModel.findById(screening.id);
 
   expect(updatedScreening!.title).toEqual(data.title);
   expect(updatedScreening!.price).toEqual(data.price);
-  expect(updatedScreening!.version).toEqual(data.version);
+  expect((updatedScreening as any)!.version).toEqual(data.version);
 });
 
 it('Запрашивает сообщение об успешном выполнении события', async () => {

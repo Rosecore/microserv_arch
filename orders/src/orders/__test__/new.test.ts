@@ -1,14 +1,12 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
-import { app } from '../../app';
-import { Order, OrderStatus } from '../../models/order';
-import { Screening } from '../../models/screening';
+import { OrderStatus } from '../schemas/order.schema';
 import { natsWrapper } from '../../nats-wrapper';
 
 it('Возвращает ошибку, если билет больше не существует', async () => {
   const ticketId = new mongoose.Types.ObjectId();
 
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/orders')
     .set('Cookie', global.signin())
     .send({ ticketId })
@@ -16,13 +14,13 @@ it('Возвращает ошибку, если билет больше не с�
 });
 
 it('Возвращает ошибку, еси билет уже зарезервирован', async () => {
-  const screening = Screening.build({
-    id: new mongoose.Types.ObjectId().toHexString(),
+  const screening = new global.screeningModel({
+    _id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
   await screening.save();
-  const order = Order.build({
+  const order = new global.orderModel({
     ticket: screening,
     userId: 'laskdflkajsdf',
     status: OrderStatus.Created,
@@ -30,7 +28,7 @@ it('Возвращает ошибку, еси билет уже зарезерв
   });
   await order.save();
 
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/orders')
     .set('Cookie', global.signin())
     .send({ ticketId: screening.id })
@@ -38,14 +36,14 @@ it('Возвращает ошибку, еси билет уже зарезерв
 });
 
 it('билет резеривруется при покупке', async () => {
-  const screening = Screening.build({
-    id: new mongoose.Types.ObjectId().toHexString(),
+  const screening = new global.screeningModel({
+    _id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
   await screening.save();
 
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/orders')
     .set('Cookie', global.signin())
     .send({ ticketId: screening.id })
@@ -53,14 +51,14 @@ it('билет резеривруется при покупке', async () => {
 });
 
 it('Запускает событие создания заказа', async () => {
-  const screening = Screening.build({
-    id: new mongoose.Types.ObjectId().toHexString(),
+  const screening = new global.screeningModel({
+    _id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
   await screening.save();
 
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/orders')
     .set('Cookie', global.signin())
     .send({ ticketId: screening.id })

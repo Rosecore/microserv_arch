@@ -1,21 +1,20 @@
 import mongoose from 'mongoose';
 import { Message } from 'node-nats-streaming';
-import { OrderStatus, ExpirationCompleteEvent } from '@anitix/shared';
+import { ExpirationCompleteEvent } from '@anitix/shared';
 import { ExpirationCompleteListener } from '../expiration-complete-listener';
 import { natsWrapper } from '../../../nats-wrapper';
-import { Order } from '../../../models/order';
-import { Screening } from '../../../models/screening';
+import { OrderStatus } from '../../../orders/schemas/order.schema';
 
 const setup = async () => {
-  const listener = new ExpirationCompleteListener(natsWrapper.client);
+  const listener = new ExpirationCompleteListener(natsWrapper.client, global.orderModel);
 
-  const screening = Screening.build({
-    id: new mongoose.Types.ObjectId().toHexString(),
+  const screening = new global.screeningModel({
+    _id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
   await screening.save();
-  const order = Order.build({
+  const order = new global.orderModel({
     status: OrderStatus.Created,
     userId: 'alskdfj',
     expiresAt: new Date(),
@@ -40,7 +39,7 @@ it('статус заказа обновляется на отмененный',
 
   await listener.onMessage(data, msg);
 
-  const updatedOrder = await Order.findById(order.id);
+  const updatedOrder = await global.orderModel.findById(order.id);
   expect(updatedOrder!.status).toEqual(OrderStatus.Cancelled);
 });
 
