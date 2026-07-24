@@ -4,16 +4,21 @@ import {
   Listener,
   OrderStatus,
 } from '@anitix/shared';
-import { Message } from 'node-nats-streaming';
+import { Message, Stan } from 'node-nats-streaming';
+import { Model } from 'mongoose';
 import { queueGroupName } from './queue-group-name';
-import { Order } from '../../models/order';
+import { OrderDocument } from '../../payments/schemas/order.schema';
 
 export class OrderCancelledListener extends Listener<OrderCancelledEvent> {
   subject: Subjects.OrderCancelled = Subjects.OrderCancelled;
   queueGroupName = queueGroupName;
 
+  constructor(client: Stan, private readonly orderModel: Model<OrderDocument>) {
+    super(client);
+  }
+
   async onMessage(data: OrderCancelledEvent['data'], msg: Message) {
-    const order = await Order.findOne({
+    const order = await this.orderModel.findOne({
       _id: data.id,
       version: data.version - 1,
     });

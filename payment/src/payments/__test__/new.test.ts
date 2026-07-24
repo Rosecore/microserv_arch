@@ -1,13 +1,9 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
 import { OrderStatus } from '@anitix/shared';
-import { app } from '../../app';
-import { Order } from '../../models/order';
-import { stripe } from '../../stripe';
-import { Payment } from '../../models/payment';
 
 it('Возвращает ошибку, если оплачивается несуществующий зааказ', async () => {
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/payments')
     .set('Cookie', global.signin())
     .send({
@@ -18,8 +14,8 @@ it('Возвращает ошибку, если оплачивается нес�
 });
 
 it('Возвращет ошибку, если производится оплата заказа не того пользователя', async () => {
-  const order = Order.build({
-    id: new mongoose.Types.ObjectId().toHexString(),
+  const order = new global.orderModel({
+    _id: new mongoose.Types.ObjectId().toHexString(),
     userId: new mongoose.Types.ObjectId().toHexString(),
     version: 0,
     price: 20,
@@ -27,7 +23,7 @@ it('Возвращет ошибку, если производится опла�
   });
   await order.save();
 
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/payments')
     .set('Cookie', global.signin())
     .send({
@@ -39,8 +35,8 @@ it('Возвращет ошибку, если производится опла�
 
 it('Возвращает ошибку при попытке оплатить отмененный заказ', async () => {
   const userId = new mongoose.Types.ObjectId().toHexString();
-  const order = Order.build({
-    id: new mongoose.Types.ObjectId().toHexString(),
+  const order = new global.orderModel({
+    _id: new mongoose.Types.ObjectId().toHexString(),
     userId,
     version: 0,
     price: 20,
@@ -48,7 +44,7 @@ it('Возвращает ошибку при попытке оплатить о�
   });
   await order.save();
 
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/payments')
     .set('Cookie', global.signin(userId))
     .send({
@@ -61,8 +57,8 @@ it('Возвращает ошибку при попытке оплатить о�
 /*it('returns a 201 with valid inputs', async () => {
   const userId = new mongoose.Types.ObjectId().toHexString();
   const price = Math.floor(Math.random() * 100000);
-  const order = Order.build({
-    id: new mongoose.Types.ObjectId().toHexString(),
+  const order = new global.orderModel({
+    _id: new mongoose.Types.ObjectId().toHexString(),
     userId,
     version: 0,
     price,
@@ -70,7 +66,7 @@ it('Возвращает ошибку при попытке оплатить о�
   });
   await order.save();
 
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/payments')
     .set('Cookie', global.signin(userId))
     .send({
@@ -87,7 +83,7 @@ it('Возвращает ошибку при попытке оплатить о�
   expect(stripeCharge).toBeDefined();
   expect(stripeCharge!.currency).toEqual('usd');
 
-  const payment = await Payment.findOne({
+  const payment = await global.paymentModel.findOne({
     orderId: order.id,
     stripeId: stripeCharge!.id,
   });

@@ -3,10 +3,9 @@ import { Message } from 'node-nats-streaming';
 import { OrderCreatedEvent, OrderStatus } from '@anitix/shared';
 import { natsWrapper } from '../../../nats-wrapper';
 import { OrderCreatedListener } from '../order-created-listener';
-import { Order } from '../../../models/order';
 
 const setup = async () => {
-  const listener = new OrderCreatedListener(natsWrapper.client);
+  const listener = new OrderCreatedListener(natsWrapper.client, global.orderModel);
 
   const data: OrderCreatedEvent['data'] = {
     id: new mongoose.Types.ObjectId().toHexString(),
@@ -33,7 +32,7 @@ it('Копирует заказ', async () => {
 
   await listener.onMessage(data, msg);
 
-  const order = await Order.findById(data.id);
+  const order = await global.orderModel.findById(data.id);
 
   expect(order!.price).toEqual(data.ticket.price);
 });
