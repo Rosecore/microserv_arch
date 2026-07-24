@@ -1,18 +1,17 @@
 import request from 'supertest';
-import { app } from '../../app';
 import mongoose from 'mongoose';
 
 it('returns a 404 if the screening is not found', async () => {
   const id = new mongoose.Types.ObjectId().toHexString();
 
-  await request(app).get(`/api/tickets/${id}`).send().expect(404);
+  await request(global.app.getHttpServer()).get(`/api/tickets/${id}`).send().expect(404);
 });
 
 it('returns the screening if the screening is found', async () => {
   const title = 'concert';
   const price = 20;
 
-  const response = await request(app)
+  const response = await request(global.app.getHttpServer())
     .post('/api/tickets')
     .set('Cookie', global.signin())
     .send({
@@ -21,7 +20,7 @@ it('returns the screening if the screening is found', async () => {
     })
     .expect(201);
 
-  const screeningResponse = await request(app)
+  const screeningResponse = await request(global.app.getHttpServer())
     .get(`/api/tickets/${response.body.id}`)
     .send()
     .expect(200);

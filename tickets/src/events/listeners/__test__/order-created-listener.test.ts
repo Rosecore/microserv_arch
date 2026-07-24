@@ -3,14 +3,13 @@ import mongoose from 'mongoose';
 import { OrderCreatedEvent, OrderStatus } from '@anitix/shared';
 import { OrderCreatedListener } from '../order-created-listener';
 import { natsWrapper } from '../../../nats-wrapper';
-import { Screening } from '../../../models/screening';
 
 const setup = async () => {
   // Create an instance of the listener
-  const listener = new OrderCreatedListener(natsWrapper.client);
+  const listener = new OrderCreatedListener(natsWrapper.client, global.screeningModel);
 
   // Create and save a screening
-  const screening = Screening.build({
+  const screening = new global.screeningModel({
     title: 'concert',
     price: 99,
     userId: 'asdf',
@@ -43,7 +42,7 @@ it('Айди пользователя, создавшего заказ, прис
 
   await listener.onMessage(data, msg);
 
-  const updatedScreening = await Screening.findById(screening.id);
+  const updatedScreening = await global.screeningModel.findById(screening.id);
 
   expect(updatedScreening!.orderId).toEqual(data.id);
 });

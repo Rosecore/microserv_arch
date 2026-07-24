@@ -1,20 +1,18 @@
 import request from 'supertest';
-import { app } from '../../app';
-import { Screening } from '../../models/screening';
 import { natsWrapper } from '../../nats-wrapper';
 
 it('has a route handler listening to /api/tickets for post requests', async () => {
-  const response = await request(app).post('/api/tickets').send({});
+  const response = await request(global.app.getHttpServer()).post('/api/tickets').send({});
 
   expect(response.status).not.toEqual(404);
 });
 
 it('can only be accessed if the user is signed in', async () => {
-  await request(app).post('/api/tickets').send({}).expect(401);
+  await request(global.app.getHttpServer()).post('/api/tickets').send({}).expect(401);
 });
 
 it('returns a status other than 401 if the user is signed in', async () => {
-  const response = await request(app)
+  const response = await request(global.app.getHttpServer())
     .post('/api/tickets')
     .set('Cookie', global.signin())
     .send({});
@@ -23,7 +21,7 @@ it('returns a status other than 401 if the user is signed in', async () => {
 });
 
 it('returns an error if an invalid title is provided', async () => {
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/tickets')
     .set('Cookie', global.signin())
     .send({
@@ -32,7 +30,7 @@ it('returns an error if an invalid title is provided', async () => {
     })
     .expect(400);
 
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/tickets')
     .set('Cookie', global.signin())
     .send({
@@ -42,7 +40,7 @@ it('returns an error if an invalid title is provided', async () => {
 });
 
 it('returns an error if an invalid price is provided', async () => {
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/tickets')
     .set('Cookie', global.signin())
     .send({
@@ -51,7 +49,7 @@ it('returns an error if an invalid price is provided', async () => {
     })
     .expect(400);
 
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/tickets')
     .set('Cookie', global.signin())
     .send({
@@ -61,12 +59,12 @@ it('returns an error if an invalid price is provided', async () => {
 });
 
 it('creates a screening with valid inputs', async () => {
-  let screenings = await Screening.find({});
+  let screenings = await global.screeningModel.find({});
   expect(screenings.length).toEqual(0);
 
   const title = 'asldkfj';
 
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/tickets')
     .set('Cookie', global.signin())
     .send({
@@ -75,7 +73,7 @@ it('creates a screening with valid inputs', async () => {
     })
     .expect(201);
 
-  screenings = await Screening.find({});
+  screenings = await global.screeningModel.find({});
   expect(screenings.length).toEqual(1);
   expect(screenings[0].price).toEqual(20);
   expect(screenings[0].title).toEqual(title);
@@ -84,7 +82,7 @@ it('creates a screening with valid inputs', async () => {
 it('publishes an event', async () => {
   const title = 'asldkfj';
 
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/tickets')
     .set('Cookie', global.signin())
     .send({

@@ -3,13 +3,12 @@ import { Message } from 'node-nats-streaming';
 import { OrderCancelledEvent } from '@anitix/shared';
 import { natsWrapper } from '../../../nats-wrapper';
 import { OrderCancelledListener } from '../order-cancelled-listener';
-import { Screening } from '../../../models/screening';
 
 const setup = async () => {
-  const listener = new OrderCancelledListener(natsWrapper.client);
+  const listener = new OrderCancelledListener(natsWrapper.client, global.screeningModel);
 
   const orderId = new mongoose.Types.ObjectId().toHexString();
-  const screening = Screening.build({
+  const screening = new global.screeningModel({
     title: 'concert',
     price: 20,
     userId: 'asdf',
@@ -38,7 +37,7 @@ it('Статус билета обновляется, публикуется с�
 
   await listener.onMessage(data, msg);
 
-  const updatedScreening = await Screening.findById(screening.id);
+  const updatedScreening = await global.screeningModel.findById(screening.id);
   expect(updatedScreening!.orderId).not.toBeDefined();
   expect(msg.ack).toHaveBeenCalled();
   expect(natsWrapper.client.publish).toHaveBeenCalled();
