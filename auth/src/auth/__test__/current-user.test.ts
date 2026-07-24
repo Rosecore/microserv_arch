@@ -1,10 +1,9 @@
 import request from 'supertest';
-import { app } from '../../app';
 
 it('Возвращает данные текущего пользователя', async () => {
   const cookie = await global.signin();
 
-  const response = await request(app)
+  const response = await request(global.app.getHttpServer())
     .get('/api/users/currentuser')
     .set('Cookie', cookie)
     .send()
@@ -14,7 +13,7 @@ it('Возвращает данные текущего пользователя'
 });
 
 it('Отвечает пустым объектом при отсутствии пользователя', async () => {
-  const response = await request(app)
+  const response = await request(global.app.getHttpServer())
     .get('/api/users/currentuser')
     .send()
     .expect(200);

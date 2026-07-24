@@ -1,8 +1,7 @@
 import request from 'supertest';
-import { app } from '../../app';
 
 it('Куки очищены после выхода', async () => {
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/users/signup')
     .send({
       email: 'test@test.com',
@@ -10,7 +9,7 @@ it('Куки очищены после выхода', async () => {
     })
     .expect(201);
 
-  const response = await request(app)
+  const response = await request(global.app.getHttpServer())
     .post('/api/users/signout')
     .send({})
     .expect(200);

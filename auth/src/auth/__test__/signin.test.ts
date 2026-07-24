@@ -1,8 +1,7 @@
 import request from 'supertest';
-import { app } from '../../app';
 
 it('Возвращает код ошибки 400, когда пользователь с такой почтой не зарегестрирован', async () => {
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/users/signin')
     .send({
       email: 'test@test.com',
@@ -12,7 +11,7 @@ it('Возвращает код ошибки 400, когда пользоват�
 });
 
 it('Возвращает код ошибки 400, когда пользователь ввел неправильный пароль ', async () => {
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/users/signup')
     .send({
       email: 'test@test.com',
@@ -20,7 +19,7 @@ it('Возвращает код ошибки 400, когда пользоват�
     })
     .expect(201);
 
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/users/signin')
     .send({
       email: 'test@test.com',
@@ -30,7 +29,7 @@ it('Возвращает код ошибки 400, когда пользоват�
 });
 
 it('Возвращает куки, когда все корректно ', async () => {
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/users/signup')
     .send({
       email: 'test@test.com',
@@ -38,7 +37,7 @@ it('Возвращает куки, когда все корректно ', async
     })
     .expect(201);
 
-  const response = await request(app)
+  const response = await request(global.app.getHttpServer())
     .post('/api/users/signin')
     .send({
       email: 'test@test.com',

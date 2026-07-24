@@ -1,8 +1,7 @@
 import request from 'supertest';
-import { app } from '../../app';
 
 it('Возвращает код 201, при успешной регистрации', async () => {
-  return request(app)
+  return request(global.app.getHttpServer())
     .post('/api/users/signup')
     .send({
       email: 'test@test.com',
@@ -12,7 +11,7 @@ it('Возвращает код 201, при успешной регистрац�
 });
 
 it('Возвращает код 400, при неправльной почте', async () => {
-  return request(app)
+  return request(global.app.getHttpServer())
     .post('/api/users/signup')
     .send({
       email: 'alskdflaskjfd',
@@ -22,7 +21,7 @@ it('Возвращает код 400, при неправльной почте', 
 });
 
 it('Вовзаращет код 400, при неправильном пароле', async () => {
-  return request(app)
+  return request(global.app.getHttpServer())
     .post('/api/users/signup')
     .send({
       email: 'alskdflaskjfd',
@@ -32,14 +31,14 @@ it('Вовзаращет код 400, при неправильном парол�
 });
 
 it('Возвращает код 400 при отсуствующей почте или пароле', async () => {
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/users/signup')
     .send({
       email: 'test@test.com'
     })
     .expect(400);
 
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/users/signup')
     .send({
       password: 'alskjdf'
@@ -48,7 +47,7 @@ it('Возвращает код 400 при отсуствующей почте �
 });
 
 it('Не допускает повторную регистрацию по одинаковой почте', async () => {
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/users/signup')
     .send({
       email: 'test@test.com',
@@ -56,7 +55,7 @@ it('Не допускает повторную регистрацию по од�
     })
     .expect(201);
 
-  await request(app)
+  await request(global.app.getHttpServer())
     .post('/api/users/signup')
     .send({
       email: 'test@test.com',
@@ -66,7 +65,7 @@ it('Не допускает повторную регистрацию по од�
 });
 
 it('Отправляет куки при успешной регистрации', async () => {
-  const response = await request(app)
+  const response = await request(global.app.getHttpServer())
     .post('/api/users/signup')
     .send({
       email: 'test@test.com',
